@@ -111,7 +111,7 @@ export default function EmployeeTable({ employees, loading, error, onRefresh, on
           <span className="search-icon">🔍</span>
           <input
             type="text"
-            placeholder="Search by name, ID, email or department..."
+            placeholder="Search name, ID, email, department..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="search-input"
@@ -122,9 +122,12 @@ export default function EmployeeTable({ employees, loading, error, onRefresh, on
         </div>
         {search && (
           <span className="search-results-count">
-            {filtered.length} of {employees.length} result{filtered.length !== 1 ? 's' : ''}
+            {filtered.length} / {employees.length}
           </span>
         )}
+        <span className="table-toolbar-info" style={{ marginLeft: 'auto' }}>
+          {!loading && `${employees.length} total`}
+        </span>
       </div>
 
       {/* Bulk action bar */}
