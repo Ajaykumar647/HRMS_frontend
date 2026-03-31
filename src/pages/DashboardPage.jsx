@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { getDashboard } from '../api/attendance';
-import { LoadingSpinner, ErrorState } from '../components/States';
+import { ErrorState } from '../components/States';
+import { SkeletonStatCards, SkeletonDashboardTable } from '../components/Skeleton';
 
 export default function DashboardPage() {
   const [data, setData] = useState(null);
@@ -20,14 +21,11 @@ export default function DashboardPage() {
     }
   };
 
-  useEffect(() => {
-    fetchDashboard();
-  }, []);
+  useEffect(() => { fetchDashboard(); }, []);
 
-  if (loading) return <LoadingSpinner text="Loading dashboard..." />;
   if (error) return <ErrorState message={error} onRetry={fetchDashboard} />;
 
-  const { summary, employee_stats } = data;
+  const { summary, employee_stats } = data || {};
 
   return (
     <>
@@ -36,41 +34,31 @@ export default function DashboardPage() {
           <h1 className="page-title">Dashboard</h1>
           <p className="page-subtitle">Overview of your workforce for today</p>
         </div>
-        <button className="btn btn-ghost" onClick={fetchDashboard}>
-          Refresh
+        <button className="btn btn-ghost" onClick={fetchDashboard} disabled={loading}>
+          🔄 Refresh
         </button>
       </div>
 
-      <div className="stats-grid">
-        <div className="stat-card blue">
-          <div className="stat-icon blue">👥</div>
-          <div className="stat-body">
-            <div className="stat-value">{summary.total_employees}</div>
-            <div className="stat-label">Total Employees</div>
-          </div>
+      {loading ? (
+        <SkeletonStatCards />
+      ) : (
+        <div className="stats-grid">
+          {[
+            { color: 'blue',   icon: '👥', value: summary.total_employees,  label: 'Total Employees'  },
+            { color: 'green',  icon: '✅', value: summary.present_today,     label: 'Present Today'   },
+            { color: 'red',    icon: '❌', value: summary.absent_today,      label: 'Absent Today'    },
+            { color: 'purple', icon: '🕐', value: summary.not_marked_today,  label: 'Not Marked Today'},
+          ].map(({ color, icon, value, label }) => (
+            <div key={label} className={`stat-card ${color}`}>
+              <div className={`stat-icon ${color}`}>{icon}</div>
+              <div className="stat-body">
+                <div className="stat-value">{value}</div>
+                <div className="stat-label">{label}</div>
+              </div>
+            </div>
+          ))}
         </div>
-        <div className="stat-card green">
-          <div className="stat-icon green">✅</div>
-          <div className="stat-body">
-            <div className="stat-value">{summary.present_today}</div>
-            <div className="stat-label">Present Today</div>
-          </div>
-        </div>
-        <div className="stat-card red">
-          <div className="stat-icon red">❌</div>
-          <div className="stat-body">
-            <div className="stat-value">{summary.absent_today}</div>
-            <div className="stat-label">Absent Today</div>
-          </div>
-        </div>
-        <div className="stat-card purple">
-          <div className="stat-icon purple">🕐</div>
-          <div className="stat-body">
-            <div className="stat-value">{summary.not_marked_today}</div>
-            <div className="stat-label">Not Marked Today</div>
-          </div>
-        </div>
-      </div>
+      )}
 
       <div className="card">
         <div className="page-header" style={{ marginBottom: '1rem' }}>
@@ -80,9 +68,14 @@ export default function DashboardPage() {
             </h2>
             <p className="page-subtitle">Total present &amp; absent days per employee</p>
           </div>
+          {!loading && employee_stats?.length > 0 && (
+            <span className="badge badge-dept">{employee_stats.length} employees</span>
+          )}
         </div>
 
-        {employee_stats.length === 0 ? (
+        {loading ? (
+          <SkeletonDashboardTable />
+        ) : employee_stats?.length === 0 ? (
           <p className="text-muted text-sm" style={{ padding: '2rem', textAlign: 'center' }}>
             No employees found. Add employees to see stats.
           </p>
@@ -108,14 +101,17 @@ export default function DashboardPage() {
                     <tr key={emp.id}>
                       <td className="text-muted text-sm">{idx + 1}</td>
                       <td><span className="td-id">{emp.employee_id}</span></td>
-                      <td style={{ fontWeight: 500 }}>{emp.full_name}</td>
-                      <td><span className="badge badge-dept">{emp.department}</span></td>
                       <td>
-                        <span className="badge badge-present">{emp.total_present} days</span>
+                        <div className="emp-name-cell">
+                          <div className="emp-avatar sm">{emp.full_name[0].toUpperCase()}</div>
+                          <span style={{ fontWeight: 600 }}>{emp.full_name}</span>
+                        </div>
                       </td>
+                      <td><span className="badge badge-dept">{emp.department}</span></td>
+                      <td><span className="badge badge-present">✅ {emp.total_present} days</span></td>
                       <td>
                         <span className={`badge ${emp.total_absent > 0 ? 'badge-absent' : 'badge-present'}`}>
-                          {emp.total_absent} days
+                          {emp.total_absent > 0 ? '❌' : '✅'} {emp.total_absent} days
                         </span>
                       </td>
                       <td>
