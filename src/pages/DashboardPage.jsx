@@ -120,17 +120,16 @@ export default function DashboardPage() {
                       </td>
                       <td>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                          <div style={{
-                            flex: 1, height: 6, background: 'var(--bg-hover)',
-                            borderRadius: 100, overflow: 'hidden', minWidth: 60,
-                          }}>
-                            <div style={{
-                              width: `${rate}%`, height: '100%',
-                              background: rate >= 75 ? 'var(--success-light)' : rate >= 50 ? 'var(--warning-light)' : 'var(--danger-light)',
-                              borderRadius: 100, transition: 'width 0.4s ease',
-                            }} />
+                          <div className="progress-bar-track">
+                            <div
+                              className="progress-bar-fill"
+                              style={{
+                                width: `${rate}%`,
+                                background: rate >= 75 ? 'var(--success-light)' : rate >= 50 ? 'var(--warning-light)' : 'var(--danger-light)',
+                              }}
+                            />
                           </div>
-                          <span className="text-sm text-muted">{rate}%</span>
+                          <span className="text-sm text-muted" style={{ minWidth: 32 }}>{rate}%</span>
                         </div>
                       </td>
                     </tr>

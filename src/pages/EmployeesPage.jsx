@@ -8,6 +8,7 @@ export default function EmployeesPage({ addToast }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [showForm, setShowForm] = useState(false);
+  const [editEmployee, setEditEmployee] = useState(null);
 
   const fetchEmployees = async () => {
     setLoading(true);
@@ -26,6 +27,16 @@ export default function EmployeesPage({ addToast }) {
     fetchEmployees();
   }, []);
 
+  const handleEdit = (emp) => {
+    setEditEmployee(emp);
+    setShowForm(true);
+  };
+
+  const handleCloseForm = () => {
+    setShowForm(false);
+    setEditEmployee(null);
+  };
+
   return (
     <>
       <div className="page-header">
@@ -35,7 +46,7 @@ export default function EmployeesPage({ addToast }) {
             {loading ? 'Loading...' : `${employees.length} employee${employees.length !== 1 ? 's' : ''} total`}
           </p>
         </div>
-        <button className="btn btn-primary" onClick={() => setShowForm(true)}>
+        <button className="btn btn-primary" onClick={() => { setEditEmployee(null); setShowForm(true); }}>
           + Add Employee
         </button>
       </div>
@@ -46,14 +57,16 @@ export default function EmployeesPage({ addToast }) {
           loading={loading}
           error={error}
           onRefresh={fetchEmployees}
+          onEdit={handleEdit}
           addToast={addToast}
         />
       </div>
 
       {showForm && (
         <EmployeeForm
+          employee={editEmployee}
           onSuccess={fetchEmployees}
-          onClose={() => setShowForm(false)}
+          onClose={handleCloseForm}
           addToast={addToast}
         />
       )}

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { createEmployee } from '../api/employees';
+import { createEmployee, updateEmployee } from '../api/employees';
 
 const DEPARTMENTS = [
   'Engineering', 'Product', 'Design', 'Marketing',
@@ -7,12 +7,14 @@ const DEPARTMENTS = [
   'Customer Support', 'Legal', 'IT', 'Other',
 ];
 
-export default function EmployeeForm({ onSuccess, onClose, addToast }) {
+export default function EmployeeForm({ employee, onSuccess, onClose, addToast }) {
+  const isEdit = Boolean(employee);
+
   const [form, setForm] = useState({
-    employee_id: '',
-    full_name: '',
-    email: '',
-    department: '',
+    employee_id: employee?.employee_id || '',
+    full_name: employee?.full_name || '',
+    email: employee?.email || '',
+    department: employee?.department || '',
   });
   const [loading, setLoading] = useState(false);
 
@@ -24,8 +26,13 @@ export default function EmployeeForm({ onSuccess, onClose, addToast }) {
     e.preventDefault();
     setLoading(true);
     try {
-      await createEmployee(form);
-      addToast('Employee added successfully!', 'success');
+      if (isEdit) {
+        await updateEmployee(employee.id, form);
+        addToast('Employee updated successfully!', 'success');
+      } else {
+        await createEmployee(form);
+        addToast('Employee added successfully!', 'success');
+      }
       onSuccess();
       onClose();
     } catch (err) {
@@ -39,7 +46,9 @@ export default function EmployeeForm({ onSuccess, onClose, addToast }) {
     <div className="modal-overlay" onClick={(e) => e.target === e.currentTarget && onClose()}>
       <div className="modal">
         <div className="modal-header">
-          <h2 className="modal-title">➕ Add New Employee</h2>
+          <h2 className="modal-title">
+            {isEdit ? '✏️ Edit Employee' : '➕ Add New Employee'}
+          </h2>
           <button className="modal-close" onClick={onClose}>✕</button>
         </div>
         <form onSubmit={handleSubmit}>
@@ -103,7 +112,9 @@ export default function EmployeeForm({ onSuccess, onClose, addToast }) {
               Cancel
             </button>
             <button type="submit" className="btn btn-primary" disabled={loading}>
-              {loading ? '⏳ Adding...' : '✅ Add Employee'}
+              {loading
+                ? (isEdit ? '⏳ Saving...' : '⏳ Adding...')
+                : (isEdit ? '💾 Save Changes' : '✅ Add Employee')}
             </button>
           </div>
         </form>

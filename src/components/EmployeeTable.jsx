@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { deleteEmployee } from '../api/employees';
 import { LoadingSpinner, EmptyState, ErrorState } from './States';
 
-export default function EmployeeTable({ employees, loading, error, onRefresh, addToast }) {
+export default function EmployeeTable({ employees, loading, error, onRefresh, onEdit, addToast }) {
   const [deletingId, setDeletingId] = useState(null);
   const [confirmId, setConfirmId] = useState(null);
   const [confirmName, setConfirmName] = useState('');
@@ -32,7 +32,7 @@ export default function EmployeeTable({ employees, loading, error, onRefresh, ad
     return (
       <EmptyState
         icon="👥"
-        title="No employees found"
+        title="No employees yet"
         description="Add your first employee to get started."
       />
     );
@@ -58,7 +58,7 @@ export default function EmployeeTable({ employees, loading, error, onRefresh, ad
               <tr key={emp.id}>
                 <td className="text-muted text-sm">{idx + 1}</td>
                 <td><span className="td-id">{emp.employee_id}</span></td>
-                <td style={{ fontWeight: 500 }}>{emp.full_name}</td>
+                <td style={{ fontWeight: 600 }}>{emp.full_name}</td>
                 <td className="text-muted">{emp.email}</td>
                 <td><span className="badge badge-dept">{emp.department}</span></td>
                 <td className="text-muted text-sm">
@@ -67,13 +67,23 @@ export default function EmployeeTable({ employees, loading, error, onRefresh, ad
                   })}
                 </td>
                 <td>
-                  <button
-                    className="btn btn-danger btn-sm"
-                    onClick={() => handleDeleteClick(emp)}
-                    disabled={deletingId === emp.id}
-                  >
-                    {deletingId === emp.id ? '⏳' : '🗑️ Delete'}
-                  </button>
+                  <div className="action-btns">
+                    <button
+                      className="btn btn-warning btn-sm"
+                      onClick={() => onEdit(emp)}
+                      title="Edit employee"
+                    >
+                      ✏️ Edit
+                    </button>
+                    <button
+                      className="btn btn-danger btn-sm"
+                      onClick={() => handleDeleteClick(emp)}
+                      disabled={deletingId === emp.id}
+                      title="Delete employee"
+                    >
+                      {deletingId === emp.id ? '⏳' : '🗑️ Delete'}
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))}
@@ -81,10 +91,9 @@ export default function EmployeeTable({ employees, loading, error, onRefresh, ad
         </table>
       </div>
 
-      {/* Confirm Delete Modal */}
       {confirmId && (
         <div className="modal-overlay" onClick={(e) => e.target === e.currentTarget && setConfirmId(null)}>
-          <div className="modal" style={{ maxWidth: '400px' }}>
+          <div className="modal" style={{ maxWidth: '420px' }}>
             <div className="modal-header">
               <h2 className="modal-title">⚠️ Confirm Delete</h2>
               <button className="modal-close" onClick={() => setConfirmId(null)}>✕</button>
@@ -93,7 +102,7 @@ export default function EmployeeTable({ employees, loading, error, onRefresh, ad
               <p className="confirm-text">
                 Are you sure you want to delete{' '}
                 <span className="confirm-name">{confirmName}</span>?{' '}
-                This action cannot be undone and will also remove all their attendance records.
+                This will also remove all their attendance records and cannot be undone.
               </p>
             </div>
             <div className="modal-footer">
