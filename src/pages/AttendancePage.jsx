@@ -10,6 +10,7 @@ export default function AttendancePage({ addToast }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [showForm, setShowForm] = useState(false);
+  const [editRecord, setEditRecord] = useState(null);
 
   const [filterEmployee, setFilterEmployee] = useState('');
   const [filterDate, setFilterDate] = useState('');
@@ -32,22 +33,23 @@ export default function AttendancePage({ addToast }) {
     }
   };
 
-  const fetchEmployees = async () => {
-    try {
-      const res = await getEmployees();
-      setEmployees(res.data);
-    } catch {
-      // employees list is only for filter/form dropdowns; silent fail
-    }
-  };
-
   useEffect(() => {
-    fetchEmployees();
+    getEmployees().then((r) => setEmployees(r.data)).catch(() => {});
   }, []);
 
   useEffect(() => {
     fetchAttendance();
   }, [filterEmployee, filterDate, filterStatus]);
+
+  const handleEdit = (rec) => {
+    setEditRecord(rec);
+    setShowForm(true);
+  };
+
+  const handleCloseForm = () => {
+    setShowForm(false);
+    setEditRecord(null);
+  };
 
   const clearFilters = () => {
     setFilterEmployee('');
@@ -66,7 +68,7 @@ export default function AttendancePage({ addToast }) {
             {loading ? 'Loading...' : `${records.length} record${records.length !== 1 ? 's' : ''}${hasFilters ? ' (filtered)' : ''}`}
           </p>
         </div>
-        <button className="btn btn-primary" onClick={() => setShowForm(true)}>
+        <button className="btn btn-primary" onClick={() => { setEditRecord(null); setShowForm(true); }}>
           + Mark Attendance
         </button>
       </div>
@@ -95,15 +97,13 @@ export default function AttendancePage({ addToast }) {
           <label>Status</label>
           <select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)}>
             <option value="">All Status</option>
-            <option value="Present">Present</option>
-            <option value="Absent">Absent</option>
+            <option value="Present">✅ Present</option>
+            <option value="Absent">❌ Absent</option>
           </select>
         </div>
         <div className="filter-actions">
           {hasFilters && (
-            <button className="btn btn-ghost" onClick={clearFilters}>
-              Clear
-            </button>
+            <button className="btn btn-ghost" onClick={clearFilters}>✕ Clear</button>
           )}
         </div>
       </div>
@@ -114,14 +114,17 @@ export default function AttendancePage({ addToast }) {
           loading={loading}
           error={error}
           onRefresh={fetchAttendance}
+          onEdit={handleEdit}
+          addToast={addToast}
         />
       </div>
 
       {showForm && (
         <AttendanceForm
+          record={editRecord}
           employees={employees}
           onSuccess={fetchAttendance}
-          onClose={() => setShowForm(false)}
+          onClose={handleCloseForm}
           addToast={addToast}
         />
       )}

@@ -465,6 +465,107 @@ input::placeholder { color: var(--text-muted); }
 .filter-bar .form-group { min-width: 180px; flex: 1; }
 .filter-actions { display: flex; gap: 0.5rem; align-items: flex-end; }
 
+/* ─── Employee Dropdown ─── */
+.emp-dropdown-wrapper { position: relative; }
+
+.emp-dropdown-trigger {
+  width: 100%; display: flex; align-items: center; justify-content: space-between;
+  padding: 0.625rem 0.875rem;
+  background: var(--bg-input); border: 1.5px solid var(--border);
+  border-radius: var(--radius-md); cursor: pointer;
+  font-family: inherit; transition: all var(--transition);
+  text-align: left;
+}
+.emp-dropdown-trigger:hover { border-color: var(--border-focus); }
+.emp-dropdown-trigger.open { border-color: var(--border-focus); box-shadow: var(--shadow-focus); }
+
+.emp-trigger-selected { display: flex; align-items: center; gap: 0.6rem; }
+.emp-trigger-name { display: block; font-size: 0.875rem; font-weight: 600; color: var(--text-primary); }
+.emp-trigger-meta { display: block; font-size: 0.72rem; color: var(--text-muted); }
+.emp-trigger-placeholder { font-size: 0.875rem; color: var(--text-muted); }
+.emp-dropdown-arrow { font-size: 0.65rem; color: var(--text-muted); flex-shrink: 0; }
+
+.emp-dropdown-panel {
+  position: absolute; top: calc(100% + 6px); left: 0; right: 0;
+  background: var(--bg-card); border: 1.5px solid var(--border);
+  border-radius: var(--radius-lg); box-shadow: var(--shadow-lg);
+  z-index: 200; overflow: hidden;
+  animation: slideUp 150ms ease;
+}
+
+.emp-search-box {
+  display: flex; align-items: center; gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-primary);
+}
+.emp-search-icon { font-size: 0.875rem; flex-shrink: 0; }
+.emp-search-input {
+  flex: 1; border: none; background: transparent;
+  font-size: 0.875rem; color: var(--text-primary);
+  outline: none; padding: 0; box-shadow: none;
+}
+
+.emp-list { max-height: 220px; overflow-y: auto; }
+
+.emp-option {
+  width: 100%; display: flex; align-items: center; gap: 0.75rem;
+  padding: 0.75rem 1rem; background: transparent;
+  border: none; cursor: pointer; text-align: left;
+  transition: background var(--transition); font-family: inherit;
+  border-bottom: 1px solid var(--border-light);
+}
+.emp-option:last-child { border-bottom: none; }
+.emp-option:hover { background: var(--bg-primary); }
+.emp-option.selected { background: var(--accent-light); }
+
+.emp-option-info { flex: 1; display: flex; flex-direction: column; }
+.emp-option-name { font-size: 0.875rem; font-weight: 600; color: var(--text-primary); }
+.emp-option-meta { font-size: 0.72rem; color: var(--text-muted); margin-top: 1px; }
+.emp-check { font-size: 0.875rem; color: var(--accent); font-weight: 700; }
+.emp-no-results { padding: 1.5rem; text-align: center; font-size: 0.875rem; color: var(--text-muted); }
+
+/* Employee Avatar */
+.emp-avatar {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent), var(--purple));
+  color: #fff; font-size: 0.875rem; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.emp-avatar.sm { width: 28px; height: 28px; font-size: 0.75rem; }
+
+.emp-selected-box {
+  display: flex; align-items: center; gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  background: var(--accent-light); border: 1.5px solid #dbeafe;
+  border-radius: var(--radius-md);
+}
+.emp-selected-name { font-size: 0.875rem; font-weight: 600; color: var(--text-primary); }
+.emp-selected-meta { font-size: 0.72rem; color: var(--text-muted); margin-top: 1px; }
+
+/* ─── Status Toggle ─── */
+.status-toggle { display: flex; gap: 0.5rem; }
+
+.status-btn {
+  flex: 1; padding: 0.625rem 0.75rem;
+  border-radius: var(--radius-md); border: 1.5px solid var(--border);
+  background: var(--bg-input); font-size: 0.875rem; font-weight: 600;
+  cursor: pointer; transition: all var(--transition); font-family: inherit;
+  color: var(--text-secondary);
+}
+.status-btn:hover { border-color: var(--border-focus); }
+.status-btn.present.active {
+  background: var(--success-bg); color: var(--success-light);
+  border-color: var(--success-border);
+  box-shadow: 0 2px 8px rgba(22,163,74,0.15);
+}
+.status-btn.absent.active {
+  background: var(--danger-bg); color: var(--danger-light);
+  border-color: var(--danger-border);
+  box-shadow: 0 2px 8px rgba(220,38,38,0.15);
+}
+
 /* ─── Confirm Dialog ─── */
 .confirm-text { color: var(--text-secondary); font-size: 0.9rem; line-height: 1.6; }
 .confirm-name { color: var(--text-primary); font-weight: 600; }
